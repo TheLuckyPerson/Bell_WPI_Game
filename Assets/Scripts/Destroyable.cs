@@ -21,6 +21,7 @@ public class Destroyable : MonoBehaviour
     {
         if(col.tag == "Bullet") {
             placer.locationQueue.Enqueue(transform.position);
+            placer.AddBlocks(1);
             Destroy(col.gameObject);
             Destroy(gameObject);
         }

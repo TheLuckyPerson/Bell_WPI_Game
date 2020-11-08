@@ -28,10 +28,11 @@ public class Shooter : Player
             if(!locationQueue.Peek()) {
                 locationQueue.Dequeue();
             } else {
-                Vector3 v = MoveTowards(locationQueue.Peek().position);
-                
-                if(v != Vector3.zero) { // bump into wall
-                    Action(v);
+                Vector3 vAction = CheckNear(locationQueue.Peek().position);
+                if(vAction != Vector3.zero) { // found target
+                    Action(vAction);
+                } else {
+                    MoveTowards(locationQueue.Peek().position);
                 }
             }
         }

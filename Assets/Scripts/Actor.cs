@@ -37,13 +37,14 @@ public class Actor : MonoBehaviour
         raycast from all 4 edge colliders in @param dir for @param dist 
         @return min dist of collision or -1 if not found 
      */
-    public bool CollisionDetect(Vector3 dir, LayerMask layer)
+    public Transform CollisionDetect(Vector3 dir, LayerMask layer)
     {
         foreach (Transform t in colliders) { // loop through all colliders
-            if (Physics2D.OverlapPoint(t.position+dir*Utils.MOVE_SCALE, layer)) { // a collider detects a valid prediction
-                return true;
+            Collider2D c = Physics2D.OverlapPoint(t.position+dir*Utils.MOVE_SCALE, layer);
+            if (c) { // a collider detects a valid prediction
+                return c.transform;
             }
         }
-        return false;
+        return null;
     }
 }
