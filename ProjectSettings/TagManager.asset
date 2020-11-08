@@ -8,6 +8,7 @@ TagManager:
   - Destroyable
   - Placer
   - Player_Manager
+  - Shooter
   layers:
   - Default
   - TransparentFX
@@ -22,7 +23,7 @@ TagManager:
   - Hole
   - Player_Manager
   - Non_Placable_Default
-  - 
+  - Non_Swap
   - 
   - 
   - 

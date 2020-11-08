@@ -49,6 +49,16 @@ public class Placer : Player
         }
     }
 
+    public override void Targeter()
+    {
+        if(locationQueue.Count > 0) {
+            targeter.gameObject.SetActive(true);
+            targeter.position = locationQueue.Peek();
+        } else {
+            base.Targeter();
+        }
+    }
+
     public void AddBlocks(int amt)
     {
         blockNum += amt;

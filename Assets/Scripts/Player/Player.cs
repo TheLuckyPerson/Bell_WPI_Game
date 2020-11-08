@@ -12,6 +12,7 @@ public class Player : Actor
 
     private List<Vector3> fourDir;
     private SpriteRenderer sprite;
+    public Transform targeter;
     
     // Start is called before the first frame update
     void Start()
@@ -51,19 +52,19 @@ public class Player : Actor
     {
         if (Input.GetKeyDown("w")) {
             MoveInDir(Vector3.up);
-            player_Manager.nonactivePl.AiControl();
+            player_Manager.OnMoveUpdate();
         }
         else if (Input.GetKeyDown("a")) {
             MoveInDir(Vector3.left);
-            player_Manager.nonactivePl.AiControl();
+            player_Manager.OnMoveUpdate();
         }
         else if (Input.GetKeyDown("s")) {
             MoveInDir(Vector3.down);
-            player_Manager.nonactivePl.AiControl();
+            player_Manager.OnMoveUpdate();
         }
         else if (Input.GetKeyDown("d")) {
             MoveInDir(Vector3.right);
-            player_Manager.nonactivePl.AiControl();
+            player_Manager.OnMoveUpdate();
         }
     }
 
@@ -72,15 +73,19 @@ public class Player : Actor
     {
         if (Input.GetKeyDown("up")) {
             Action(Vector3.up);
+            player_Manager.OnMoveUpdate();  
         }
         else if (Input.GetKeyDown("left")) {
             Action(Vector3.left);
+            player_Manager.OnMoveUpdate();
         }
         else if (Input.GetKeyDown("down")) {
             Action(Vector3.down);
+            player_Manager.OnMoveUpdate();
         }
         else if (Input.GetKeyDown("right")) {
             Action(Vector3.right);
+            player_Manager.OnMoveUpdate();
         }
     }
 
@@ -88,6 +93,12 @@ public class Player : Actor
     {
 
     }
+
+    public virtual void Targeter()
+    {
+        targeter.gameObject.SetActive(false);
+    }
+
 
     /*
         attempt to move towards given position

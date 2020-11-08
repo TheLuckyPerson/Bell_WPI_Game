@@ -37,4 +37,14 @@ public class Shooter : Player
             }
         }
     }
+
+    public override void Targeter()
+    {
+        if(locationQueue.Count > 0 && locationQueue.Peek()) {
+            targeter.gameObject.SetActive(true);
+            targeter.position = locationQueue.Peek().position;
+        } else {
+            base.Targeter();
+        }
+    }
 }
