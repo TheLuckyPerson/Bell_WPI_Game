@@ -33,6 +33,7 @@ public class Actor : MonoBehaviour
         cant @return false
     */
     public virtual bool MoveInDir(Vector3 dir) {
+        player_Manager.targetList.Add(transform, transform.position+dir*Utils.MOVE_SCALE);
         if(!CollisionDetect(dir, wallLayer)) {
             transform.position += Utils.MOVE_SCALE * dir;
             return true;
@@ -56,6 +57,9 @@ public class Actor : MonoBehaviour
         Collider2D c = Physics2D.OverlapPoint(transform.position+dir*Utils.MOVE_SCALE, layer);
         if (c) { // a collider detects a valid prediction
             return c.transform;
+        }
+        foreach(KeyValuePair<Transform,Vector3> t in player_Manager.targetList) {
+            if(t.Value == transform.position+dir*Utils.MOVE_SCALE && t.Key != transform && layer == (layer | (1<<transform.gameObject.layer))) return t.Key;
         }
         return null;
     }

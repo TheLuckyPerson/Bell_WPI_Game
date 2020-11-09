@@ -19,6 +19,7 @@ public class Shooter : Player
 
     public override void Action(Vector3 dir)
     {
+        base.Action(dir);
         GameObject g = Instantiate(bullet, transform.position + dir * Utils.MOVE_SCALE, Quaternion.identity);
         g.GetComponent<Bullet>().dir = dir;
     }

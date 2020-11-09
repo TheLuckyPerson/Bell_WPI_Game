@@ -13,10 +13,12 @@ public class Player_Manager : MonoBehaviour
     public Shooter shooter;
     public LayerMask antiSwap;
     public List<Actor> autoAct;
+    public Dictionary<Transform, Vector3> targetList;
 
     // Start is called before the first frame update
     void Awake()
     {
+        targetList = new Dictionary<Transform, Vector3>();
         autoAct = new List<Actor>();
         activePl = placer;
         nonactivePl = shooter;
@@ -70,5 +72,6 @@ public class Player_Manager : MonoBehaviour
             else
                 autoAct.RemoveAt(i);
         }
+        targetList = new Dictionary<Transform, Vector3>();
     }
 }

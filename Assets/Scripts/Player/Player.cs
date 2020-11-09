@@ -133,7 +133,7 @@ public class Player : Actor
 
     public virtual void Action(Vector3 dir)
     {
-        
+        player_Manager.targetList.Add(transform, transform.position+dir*Utils.MOVE_SCALE);
     }
 
     public void OnTriggerEnter2D(Collider2D col) {

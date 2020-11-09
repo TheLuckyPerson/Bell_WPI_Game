@@ -38,6 +38,7 @@ public class Placer : Player
 
     public override void Action(Vector3 dir)
     {
+        base.Action(dir);
         if(blockTypes[selectedId].blockNum > 0) {
             if(!CollisionDetect(dir, nonPlacableLayer)) {
                 Vector3 loc = transform.position + dir * Utils.MOVE_SCALE;
