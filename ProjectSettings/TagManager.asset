@@ -9,6 +9,11 @@ TagManager:
   - Placer
   - Player_Manager
   - Shooter
+  - Door
+  - Kill
+  - MoveTxt
+  - PlaceTxt
+  - NormalWall
   layers:
   - Default
   - TransparentFX
@@ -24,7 +29,7 @@ TagManager:
   - Player_Manager
   - Non_Placable_Default
   - Non_Swap
-  - 
+  - Push
   - 
   - 
   - 

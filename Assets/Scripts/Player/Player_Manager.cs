@@ -15,8 +15,9 @@ public class Player_Manager : MonoBehaviour
     public List<Actor> autoAct;
 
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
+        autoAct = new List<Actor>();
         activePl = placer;
         nonactivePl = shooter;
     }
@@ -35,12 +36,16 @@ public class Player_Manager : MonoBehaviour
 
     public void Swap()
     {
-        if(Input.GetKeyDown("space") && !Physics2D.OverlapPoint(activePl.transform.position, antiSwap)) {
+        if(Input.GetKeyDown("space") && !Physics2D.OverlapPoint(activePl.transform.position, antiSwap) && !Physics2D.OverlapPoint(nonactivePl.transform.position, antiSwap) && activePl.swapable) {
             if(activePl == placer) {
                 SetActivePlayer(shooter, placer);
             } else {
                 SetActivePlayer(placer, shooter);
             }
+        }
+
+        if(!activePl.swapable) {
+            SetActivePlayer(nonactivePl, activePl);
         }
     }
 
@@ -48,16 +53,22 @@ public class Player_Manager : MonoBehaviour
     {
         activePl = p;
         nonactivePl = np;
+        activePl.arrow.gameObject.SetActive(false);
         activePl.ActiveSprite(true);
         nonactivePl.ActiveSprite(false);
     }
 
     public void OnMoveUpdate()
     {
-        nonactivePl.AiControl();
-        foreach(Actor a in autoAct)
+        if(nonactivePl.swapable) {
+            nonactivePl.AiControl();
+        }
+        for(int i = 0; i < autoAct.Count; i++)
         {
-            a.AutoAct();
+            if(autoAct[i])  
+                autoAct[i].AutoAct();
+            else
+                autoAct.RemoveAt(i);
         }
     }
 }

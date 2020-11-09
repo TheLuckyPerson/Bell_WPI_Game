@@ -5,33 +5,46 @@ using TMPro;
 
 public class Placer : Player
 {
-    public GameObject placableObject;
-    public Queue<Vector3> locationQueue;
-    public TextMeshProUGUI blockNumText;
+    [Header("Assign")]
+    public Transform blockSelector;
+    public int selectedId;
     public int blockNum = 5;
+    public int blockNumMove = 1;
     public LayerMask holeLayer;
     public LayerMask nonPlacableLayer;
+    public Queue<Vector3> locationQueue; // uses z pos as id
+    public List<BlockStorage> blockTypes;
+
     public override void Init()
     {
+        base.Init();
         locationQueue = new Queue<Vector3>();
-
+        foreach(BlockStorage b in blockTypes) b.UpdateBlockText();
     }
+
+    void Update()
+    {
+        if(Input.GetKeyDown(KeyCode.LeftShift) && this == player_Manager.activePl) {
+            UpdateSelectedID(selectedId+1);
+        }
+    }
+
+    void UpdateSelectedID(int id)
+    {
+        selectedId = id;
+        selectedId%=blockTypes.Count;
+        blockSelector.transform.position = blockTypes[selectedId].blockNumText.transform.position;
+    }
+
     public override void Action(Vector3 dir)
     {
-        if(blockNum > 0) {
-            Transform hole = CollisionDetect(dir, holeLayer);
-            if(!hole && !CollisionDetect(dir, nonPlacableLayer)) {
+        if(blockTypes[selectedId].blockNum > 0) {
+            if(!CollisionDetect(dir, nonPlacableLayer)) {
                 Vector3 loc = transform.position + dir * Utils.MOVE_SCALE;
-                GameObject g = Instantiate(placableObject, loc, Quaternion.identity);
+                GameObject g = Instantiate(blockTypes[selectedId].placableObject, loc, Quaternion.identity);
+                g.GetComponent<Destroyable>().dir = dir;
                 player_Manager.shooter.locationQueue.Enqueue(g.transform);
-                AddBlocks(-1);
-            } else if(hole) {
-                Hole h = hole.GetComponent<Hole>();
-                GameObject g = Instantiate(placableObject, h.transform.position, Quaternion.identity);
-                g.SetActive(false); // DOING SOME REALLY SKETCH STUFF
-                h.FillHole();
-                h.sketchObj = g;
-                player_Manager.shooter.locationQueue.Enqueue(g.transform);
+                blockTypes[selectedId].AddBlocks(-1);
             }
         }
     }
@@ -41,6 +54,7 @@ public class Placer : Player
         if(locationQueue.Count > 0) {
             Vector3 vAction = CheckNear(locationQueue.Peek());
             if(vAction != Vector3.zero) { // near a target
+                UpdateSelectedID((int)locationQueue.Peek().z);
                 Action(vAction);
                 locationQueue.Dequeue();
             } else {
@@ -59,9 +73,9 @@ public class Placer : Player
         }
     }
 
-    public void AddBlocks(int amt)
+    public void AddBlocks(int amt, int typeId)
     {
         blockNum += amt;
-        blockNumText.text = blockNum.ToString();
+        blockTypes[typeId].AddBlocks(amt);
     }
 }

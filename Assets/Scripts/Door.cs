@@ -20,12 +20,16 @@ public class Door : MonoBehaviour
     public void SetOpen()
     {
         gameObject.layer = 12;
+        gameObject.tag = "Untagged";
+        transform.GetChild(0).gameObject.SetActive(false);
         sprite.color = new Color(1,1,1,.25f);
     }
 
     public void SetClose()
     {
+        gameObject.tag = "Door";
         gameObject.layer = 8;
+        transform.GetChild(0).gameObject.SetActive(true);
         sprite.color = new Color(1,1,1,1f);
     }
 }

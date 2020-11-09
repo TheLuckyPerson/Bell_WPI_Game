@@ -4,13 +4,21 @@ using UnityEngine;
 
 public class Actor : MonoBehaviour
 {
-    public List<Transform> colliders;
     private const float COLLISION_CONTACT_OFFSET = .02f; 
     public LayerMask wallLayer;
+    public LayerMask movableLayer;
+    public Player_Manager player_Manager;
 
     // Start is called before the first frame update
     void Start()
     {
+        player_Manager = GameObject.FindGameObjectWithTag("Player_Manager").GetComponent<Player_Manager>();
+        Init();
+    }
+
+    public virtual void Init()
+    {
+
     }
 
     // Update is called once per frame
@@ -24,10 +32,17 @@ public class Actor : MonoBehaviour
         if can @return true
         cant @return false
     */
-    public bool MoveInDir(Vector3 dir) {
+    public virtual bool MoveInDir(Vector3 dir) {
         if(!CollisionDetect(dir, wallLayer)) {
             transform.position += Utils.MOVE_SCALE * dir;
             return true;
+        } else {
+            Transform c = CollisionDetect(dir, movableLayer);
+            if(c) {
+                if(c.GetComponent<Movable>().MoveInDir(dir)) {
+                    transform.position += Utils.MOVE_SCALE * dir;
+                }
+            }
         }
         return false;
     }
@@ -38,11 +53,9 @@ public class Actor : MonoBehaviour
      */
     public Transform CollisionDetect(Vector3 dir, LayerMask layer)
     {
-        foreach (Transform t in colliders) { // loop through all colliders
-            Collider2D c = Physics2D.OverlapPoint(t.position+dir*Utils.MOVE_SCALE, layer);
-            if (c) { // a collider detects a valid prediction
-                return c.transform;
-            }
+        Collider2D c = Physics2D.OverlapPoint(transform.position+dir*Utils.MOVE_SCALE, layer);
+        if (c) { // a collider detects a valid prediction
+            return c.transform;
         }
         return null;
     }

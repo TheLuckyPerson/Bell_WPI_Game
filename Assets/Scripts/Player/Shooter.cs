@@ -10,6 +10,7 @@ public class Shooter : Player
     
     public override void Init()
     {
+        base.Init();
         locationQueue = new Queue<Transform>();
         foreach(GameObject g in GameObject.FindGameObjectsWithTag("Destroyable")) {
             locationQueue.Enqueue(g.transform);

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+// TODO: update sprite for each hole type
 public class Hole : MonoBehaviour
 {
     Player_Manager players;
@@ -9,6 +10,7 @@ public class Hole : MonoBehaviour
     SpriteRenderer spriteRenderer;
     public Color filledCol; // temp var
     public GameObject sketchObj;
+    public int typeId;
     bool filled;
     // Start is called before the first frame update
     void Start()
@@ -29,7 +31,6 @@ public class Hole : MonoBehaviour
         gameObject.layer = 0;
         spriteRenderer.color = filledCol;
         filled = true;
-        players.placer.AddBlocks(-1);
     }
 
     public void DestroyHole()
@@ -37,7 +38,7 @@ public class Hole : MonoBehaviour
         gameObject.layer = 10;
         spriteRenderer.color = new Color(0,0,0,.25f);
         filled = false;
-        players.placer.AddBlocks(1);
+        players.placer.AddBlocks(1, typeId);
         players.placer.locationQueue.Enqueue(transform.position);
     }
 

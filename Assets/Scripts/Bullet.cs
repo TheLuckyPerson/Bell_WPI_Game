@@ -14,4 +14,11 @@ public class Bullet : MonoBehaviour
         rb2d.velocity = dir * speed;
         Destroy(gameObject, 2);
     }
+
+    void OnTriggerEnter2D(Collider2D col)
+    {
+        if(col.tag == "NormalWall" || col.tag == "Door") {
+            Destroy(gameObject);
+        }
+    }
 }

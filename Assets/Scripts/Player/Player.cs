@@ -4,33 +4,27 @@ using UnityEngine;
 
 public class Player : Actor
 {
-    public float speed;
-    private Vector3 movementVector;
-    public Vector3 direction;
     private Rigidbody2D rb2d;
-    public Player_Manager player_Manager;
 
     private List<Vector3> fourDir;
     private SpriteRenderer sprite;
     public Transform targeter;
-    
-    // Start is called before the first frame update
-    void Start()
+    public bool swapable = true;
+    public Vector3 spawn;
+    public Transform arrow;
+
+    public override void Init()
     {
+        spawn = transform.position;
+        arrow = transform.GetChild(0);
         fourDir = new List<Vector3>();
         rb2d = GetComponent<Rigidbody2D>();
         sprite = GetComponent<SpriteRenderer>();
-        player_Manager = transform.parent.GetComponent<Player_Manager>();
+        // player_Manager = transform.parent.GetComponent<Player_Manager>();
         fourDir.Add(Vector3.right*Utils.MOVE_SCALE);
         fourDir.Add(Vector3.up*Utils.MOVE_SCALE); 
         fourDir.Add(Vector3.left*Utils.MOVE_SCALE);
         fourDir.Add(Vector3.down*Utils.MOVE_SCALE);
-        Init();
-    }
-
-    public virtual void Init()
-    {
-
     }
 
     // Update is called once per frame
@@ -94,9 +88,15 @@ public class Player : Actor
 
     }
 
+    public void DestroyPlayer()
+    {
+        transform.position = spawn;
+    }
+
     public virtual void Targeter()
     {
         targeter.gameObject.SetActive(false);
+        arrow.gameObject.SetActive(false);
     }
 
 
@@ -106,21 +106,25 @@ public class Player : Actor
         if wall found @return direction attempted
         @return zero vector normally
     */
-    public Vector3 MoveTowards(Vector3 pos) 
+    public void MoveTowards(Vector3 pos) 
     {
         Vector3 v;
         if(transform.position.y - pos.y != 0 && (pos.y-transform.position.y < pos.x-transform.position.x || pos.x-transform.position.x == 0)) {
             v = pos.y-transform.position.y > 0 ? Vector3.up : Vector3.down;
-            if(!MoveInDir(v)) return v;
-        } else if(pos.x-transform.position.x != 0) {
+            arrow.gameObject.SetActive(true);
+            arrow.rotation = Quaternion.Euler(0,0,Mathf.Atan2(v.x,v.y) * Mathf.Rad2Deg);
+            MoveInDir(v);
+        } else /*if(pos.x-transform.position.x != 0) */{
             v = pos.x-transform.position.x > 0 ? Vector3.right : Vector3.left;
-            if(!MoveInDir(v)) return v;
+            arrow.gameObject.SetActive(true);
+            arrow.rotation = Quaternion.Euler(0,0,-Mathf.Atan2(v.x,v.y) * Mathf.Rad2Deg);
+            MoveInDir(v);
         }
-        return Vector3.zero;
     }
 
     public Vector3 CheckNear(Vector3 testPos)
     {
+        testPos.z = 0;
         foreach(Vector3 v in fourDir) {
             if(transform.position + v == testPos) return v;
         }
@@ -130,5 +134,19 @@ public class Player : Actor
     public virtual void Action(Vector3 dir)
     {
         
+    }
+
+    public void OnTriggerEnter2D(Collider2D col) {
+        if(col.tag == "Finish") {
+            swapable = false;
+        } else if(col.tag == "Kill"){
+            DestroyPlayer();
+        }
+    }
+
+    public void OnTriggerStay2D(Collider2D col) {
+        if(col.tag == "Door") {
+            DestroyPlayer();
+        }
     }
 }
