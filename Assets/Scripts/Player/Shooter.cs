@@ -12,21 +12,31 @@ public class Shooter : Player
     {
         base.Init();
         locationQueue = new Queue<Transform>();
+        StartCoroutine(LateStart());
+    }
+    
+    IEnumerator LateStart()
+    {
+        player_Manager.canMove = false;
+        yield return new WaitForSeconds(.1f);
         foreach(GameObject g in GameObject.FindGameObjectsWithTag("Destroyable")) {
             locationQueue.Enqueue(g.transform);
         }
+        player_Manager.canMove = true;
     }
 
     public override void Action(Vector3 dir)
     {
-        base.Action(dir);
-        GameObject g = Instantiate(bullet, transform.position + dir * Utils.MOVE_SCALE, Quaternion.identity);
-        g.GetComponent<Bullet>().dir = dir;
+        if(gameObject.activeSelf) {
+            base.Action(dir);
+            GameObject g = Instantiate(bullet, transform.position + dir * Utils.MOVE_SCALE, Quaternion.identity);
+            g.GetComponent<Bullet>().dir = dir;
+        }
     }
 
     public override void AiControl()
     {
-        if(locationQueue.Count > 0) {
+        if(gameObject.activeSelf && locationQueue.Count > 0) {
             if(!locationQueue.Peek()) {
                 locationQueue.Dequeue();
             } else {
@@ -42,11 +52,15 @@ public class Shooter : Player
 
     public override void Targeter()
     {
-        if(locationQueue.Count > 0 && locationQueue.Peek()) {
-            targeter.gameObject.SetActive(true);
-            targeter.position = locationQueue.Peek().position;
+        if(gameObject.activeSelf) {
+            if(locationQueue.Count > 0 && locationQueue.Peek()) {
+                targeter.gameObject.SetActive(true);
+                targeter.position = locationQueue.Peek().position;
+            } else {
+                base.Targeter();
+            }
         } else {
-            base.Targeter();
+            targeter.gameObject.SetActive(false);
         }
     }
 }

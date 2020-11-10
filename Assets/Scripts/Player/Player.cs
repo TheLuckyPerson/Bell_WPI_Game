@@ -10,12 +10,10 @@ public class Player : Actor
     private SpriteRenderer sprite;
     public Transform targeter;
     public bool swapable = true;
-    public Vector3 spawn;
     public Transform arrow;
 
     public override void Init()
     {
-        spawn = transform.position;
         arrow = transform.GetChild(0);
         fourDir = new List<Vector3>();
         rb2d = GetComponent<Rigidbody2D>();
@@ -88,15 +86,47 @@ public class Player : Actor
 
     }
 
+    /*
+        attempt to move in dir
+        if can @return true
+        cant @return false
+    */
+    public override bool MoveInDir(Vector3 dir) {
+        if(gameObject.activeSelf) {
+            player_Manager.targetList.Add(transform, transform.position+dir*Utils.MOVE_SCALE);
+            if(!CollisionDetect(dir, wallLayer)) {
+                transform.position += Utils.MOVE_SCALE * dir;
+                return true;
+            } else {
+                Transform c = CollisionDetect(dir, player_Manager.keyDoorLayer);
+                if(c) {
+                    if(player_Manager.keys > 0) {
+                        player_Manager.AddKeys(-1);
+                        Destroy(c.gameObject);
+                    }
+                }
+                c = CollisionDetect(dir, movableLayer);
+                if(c) {
+                    if(c.GetComponent<Movable>().MoveInDir(dir)) {
+                        transform.position += Utils.MOVE_SCALE * dir;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
     public void DestroyPlayer()
     {
-        transform.position = spawn;
+        transform.position = player_Manager.spawn;
     }
 
     public virtual void Targeter()
     {
-        targeter.gameObject.SetActive(false);
-        arrow.gameObject.SetActive(false);
+        if(gameObject.activeSelf) {
+            targeter.gameObject.SetActive(false);
+            arrow.gameObject.SetActive(false);
+        }
     }
 
 
@@ -139,8 +169,13 @@ public class Player : Actor
     public void OnTriggerEnter2D(Collider2D col) {
         if(col.tag == "Finish") {
             swapable = false;
-        } else if(col.tag == "Kill"){
+        } else if(col.tag == "Kill" || col.tag == "Hole"){
             DestroyPlayer();
+        } else if(col.tag == "Key") {
+            player_Manager.AddKeys(1);
+            Destroy(col.gameObject);
+        } else if(col.tag == "Respawn") {
+            player_Manager.spawn = col.transform.position;
         }
     }
 

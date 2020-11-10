@@ -124,7 +124,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   wallLayer:
     serializedVersion: 2
-    m_Bits: 21248
+    m_Bits: 54016
   movableLayer:
     serializedVersion: 2
     m_Bits: 0

@@ -29,6 +29,7 @@ public class Hole : MonoBehaviour
     public void FillHole()
     {
         gameObject.layer = 0;
+        transform.GetChild(0).gameObject.SetActive(false);
         spriteRenderer.color = filledCol;
         filled = true;
     }
@@ -36,6 +37,7 @@ public class Hole : MonoBehaviour
     public void DestroyHole()
     {
         gameObject.layer = 10;
+        transform.GetChild(0).gameObject.SetActive(true);
         spriteRenderer.color = new Color(0,0,0,.25f);
         filled = false;
         players.placer.AddBlocks(1, typeId);

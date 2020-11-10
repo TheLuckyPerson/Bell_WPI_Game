@@ -8,7 +8,7 @@ public class BlockStorage
 {
     public GameObject placableObject;
     public TextMeshProUGUI blockNumText;
-    public bool exists;
+    public bool notExists;
     public int blockNum = 0;
 
     public void AddBlocks(int amt)

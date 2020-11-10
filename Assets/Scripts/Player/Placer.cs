@@ -32,27 +32,33 @@ public class Placer : Player
     void UpdateSelectedID(int id)
     {
         selectedId = id;
-        selectedId%=blockTypes.Count;
+        while(blockTypes[selectedId].notExists) {
+            selectedId+=1;
+            selectedId%=blockTypes.Count;
+        }
         blockSelector.transform.position = blockTypes[selectedId].blockNumText.transform.position;
     }
 
     public override void Action(Vector3 dir)
     {
-        base.Action(dir);
-        if(blockTypes[selectedId].blockNum > 0) {
-            if(!CollisionDetect(dir, nonPlacableLayer)) {
-                Vector3 loc = transform.position + dir * Utils.MOVE_SCALE;
-                GameObject g = Instantiate(blockTypes[selectedId].placableObject, loc, Quaternion.identity);
-                g.GetComponent<Destroyable>().dir = dir;
-                player_Manager.shooter.locationQueue.Enqueue(g.transform);
-                blockTypes[selectedId].AddBlocks(-1);
+        if(gameObject.activeSelf) {
+            base.Action(dir);
+            if(blockTypes[selectedId].blockNum > 0) {
+                if(!CollisionDetect(dir, nonPlacableLayer)) {
+                    Vector3 loc = transform.position + dir * Utils.MOVE_SCALE;
+                    GameObject g = Instantiate(blockTypes[selectedId].placableObject, loc, Quaternion.identity);
+                    g.GetComponent<Destroyable>().dir = dir;
+                    if(player_Manager.shooter.gameObject.activeSelf)
+                        player_Manager.shooter.locationQueue.Enqueue(g.transform);
+                    blockTypes[selectedId].AddBlocks(-1);
+                }
             }
         }
     }
 
     public override void AiControl()
     {
-        if(locationQueue.Count > 0) {
+        if(gameObject.activeSelf && locationQueue.Count > 0) {
             Vector3 vAction = CheckNear(locationQueue.Peek());
             if(vAction != Vector3.zero) { // near a target
                 UpdateSelectedID((int)locationQueue.Peek().z);
@@ -66,11 +72,15 @@ public class Placer : Player
 
     public override void Targeter()
     {
-        if(locationQueue.Count > 0) {
-            targeter.gameObject.SetActive(true);
-            targeter.position = locationQueue.Peek();
+        if(gameObject.activeSelf) {
+            if(locationQueue.Count > 0) {
+                targeter.gameObject.SetActive(true);
+                targeter.position = locationQueue.Peek();
+            } else {
+                base.Targeter();
+            }
         } else {
-            base.Targeter();
+            targeter.gameObject.SetActive(false);
         }
     }
 

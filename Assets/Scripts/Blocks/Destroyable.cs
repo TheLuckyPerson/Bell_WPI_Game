@@ -23,16 +23,18 @@ public class Destroyable : Actor
     {
         Vector3 v = transform.position;
         v.z = typeId; // store type id in queue
-        player_Manager.placer.locationQueue.Enqueue(v);
-        player_Manager.placer.AddBlocks(1, typeId);
+        if(player_Manager.placer.gameObject.activeSelf) {
+            player_Manager.placer.locationQueue.Enqueue(v);
+            player_Manager.placer.AddBlocks(1, typeId);
+        }
         Destroy(gameObject);
     }
 
     void OnTriggerEnter2D(Collider2D col)
     {
         if(col.tag == "Bullet") {
-            DestroyBlock();
             Destroy(col.gameObject);
+            DestroyBlock();
         }
     }
 
