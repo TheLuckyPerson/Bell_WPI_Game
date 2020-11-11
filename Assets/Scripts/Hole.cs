@@ -12,6 +12,7 @@ public class Hole : MonoBehaviour
     public GameObject sketchObj;
     public int typeId;
     bool filled;
+    bool beingDestroyed;
     // Start is called before the first frame update
     void Start()
     {
@@ -32,16 +33,20 @@ public class Hole : MonoBehaviour
         transform.GetChild(0).gameObject.SetActive(false);
         spriteRenderer.color = filledCol;
         filled = true;
+        beingDestroyed = false;
     }
 
     public void DestroyHole()
     {
-        gameObject.layer = 10;
-        transform.GetChild(0).gameObject.SetActive(true);
-        spriteRenderer.color = new Color(0,0,0,.25f);
-        filled = false;
-        players.placer.AddBlocks(1, typeId);
-        players.placer.locationQueue.Enqueue(transform.position);
+        if(!beingDestroyed) {
+            beingDestroyed = true;
+            gameObject.layer = 10;
+            transform.GetChild(0).gameObject.SetActive(true);
+            spriteRenderer.color = new Color(0,0,0,.25f);
+            filled = false;
+            players.placer.AddBlocks(1, typeId);
+            players.placer.locationQueue.Enqueue(transform.position);
+        }
     }
 
     void OnTriggerEnter2D(Collider2D col)

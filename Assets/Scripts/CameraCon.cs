@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.U2D;
 
 public class CameraCon : MonoBehaviour
 {
@@ -19,13 +20,17 @@ public class CameraCon : MonoBehaviour
     public float magnitude;
 
     public float screenShakeOption = .7f;
-
+    public PixelPerfectCamera pixelPerfectCamera;
     public static float moveSpeed = 3.5f;
     public bool followPlayer = true;
+    public int ppuMax = 120;
+    public int ppuMin = 30;
+    public int ppuSpeed = 8;
 
     // Use this for initialization
     void Start()
     {
+        pixelPerfectCamera = GetComponent<PixelPerfectCamera>();
         playerPos = player.position;
         StartCoroutine(Shake());
     }
@@ -41,6 +46,13 @@ public class CameraCon : MonoBehaviour
             transform.position += Vector3.right * Time.deltaTime * moveSpeed;
             transform.position = new Vector3(transform.position.x, Vector3.Lerp(transform.position, targetPos, speed * 3 * Time.fixedDeltaTime).y, -10);
         }
+    }
+    void Update()
+    {
+        int updateAmt = pixelPerfectCamera.assetsPPU + ((int)Input.mouseScrollDelta.y)*ppuSpeed;
+        if(updateAmt > ppuMax) pixelPerfectCamera.assetsPPU = ppuMax;
+        else if(updateAmt < ppuMin) pixelPerfectCamera.assetsPPU = ppuMin;
+        else pixelPerfectCamera.assetsPPU = updateAmt;
     }
     IEnumerator Shake()
     {

@@ -5,9 +5,8 @@ using UnityEngine;
 public class Player : Actor
 {
     private Rigidbody2D rb2d;
-
     private List<Vector3> fourDir;
-    private SpriteRenderer sprite;
+    public  SpriteRenderer sprite;
     public Transform targeter;
     public bool swapable = true;
     public Transform arrow;
@@ -17,7 +16,6 @@ public class Player : Actor
         arrow = transform.GetChild(0);
         fourDir = new List<Vector3>();
         rb2d = GetComponent<Rigidbody2D>();
-        sprite = GetComponent<SpriteRenderer>();
         // player_Manager = transform.parent.GetComponent<Player_Manager>();
         fourDir.Add(Vector3.right*Utils.MOVE_SCALE);
         fourDir.Add(Vector3.up*Utils.MOVE_SCALE); 
@@ -139,7 +137,7 @@ public class Player : Actor
     public void MoveTowards(Vector3 pos) 
     {
         Vector3 v;
-        if(transform.position.y - pos.y != 0 && (pos.y-transform.position.y < pos.x-transform.position.x || pos.x-transform.position.x == 0)) {
+        if(transform.position.y - pos.y != 0 && pos.x-transform.position.x == 0) {
             v = pos.y-transform.position.y > 0 ? Vector3.up : Vector3.down;
             arrow.gameObject.SetActive(true);
             arrow.rotation = Quaternion.Euler(0,0,Mathf.Atan2(v.x,v.y) * Mathf.Rad2Deg);
@@ -161,9 +159,11 @@ public class Player : Actor
         return Vector3.zero;
     }
 
-    public virtual void Action(Vector3 dir)
+    public virtual bool Action(Vector3 dir)
     {
         player_Manager.targetList.Add(transform, transform.position+dir*Utils.MOVE_SCALE);
+        priority = player_Manager.targetList.Count;
+        return false;
     }
 
     public void OnTriggerEnter2D(Collider2D col) {

@@ -28,10 +28,13 @@ public class Momentum : Destroyable
 
     public override void DestroyBlock()
     {
-        Vector3 v = transform.position;
-        v.z = typeId; // store type id in queue
-        player_Manager.placer.locationQueue.Enqueue(v);
-        player_Manager.placer.AddBlocks(1, typeId);
-        Destroy(gameObject);
+        if(!beingDestroyed) {
+            beingDestroyed = true;
+            Vector3 v = transform.position;
+            v.z = typeId; // store type id in queue
+            player_Manager.placer.locationQueue.Enqueue(v);
+            player_Manager.placer.AddBlocks(1, typeId);
+            Destroy(gameObject);
+        }
     }
 }

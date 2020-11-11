@@ -6,6 +6,7 @@ public class Shooter : Player
 {   
     public GameObject bullet;
     public Queue<Transform> locationQueue;
+    public Transform nextAddObj;
     // Start is called before the first frame update
     
     public override void Init()
@@ -25,29 +26,41 @@ public class Shooter : Player
         player_Manager.canMove = true;
     }
 
-    public override void Action(Vector3 dir)
+    public override bool Action(Vector3 dir)
     {
         if(gameObject.activeSelf) {
             base.Action(dir);
             GameObject g = Instantiate(bullet, transform.position + dir * Utils.MOVE_SCALE, Quaternion.identity);
             g.GetComponent<Bullet>().dir = dir;
         }
+        return false;
     }
 
     public override void AiControl()
     {
-        if(gameObject.activeSelf && locationQueue.Count > 0) {
-            if(!locationQueue.Peek()) {
-                locationQueue.Dequeue();
-            } else {
-                Vector3 vAction = CheckNear(locationQueue.Peek().position);
-                if(vAction != Vector3.zero) { // found target
-                    Action(vAction);
+        if(gameObject.activeSelf) {
+            if(locationQueue.Count > 0){
+                if(!locationQueue.Peek()) {
+                    locationQueue.Dequeue();
                 } else {
-                    MoveTowards(locationQueue.Peek().position);
+                    Vector3 vAction = CheckNear(locationQueue.Peek().position);
+                    if(vAction != Vector3.zero) { // found target
+                        Action(vAction);
+                    } else {
+                        MoveTowards(locationQueue.Peek().position);
+                    }
                 }
             }
+            if(nextAddObj) {
+                player_Manager.shooter.locationQueue.Enqueue(nextAddObj);
+                nextAddObj = null;
+            }
         }
+    }
+
+    public void UpdateQueue(Transform obj)
+    {
+        nextAddObj = obj;
     }
 
     public override void Targeter()

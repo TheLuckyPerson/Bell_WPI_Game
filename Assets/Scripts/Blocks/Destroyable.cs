@@ -7,6 +7,7 @@ public class Destroyable : Actor
     public LayerMask holeLayer;
     public int typeId;
     public Vector3 dir;
+    protected bool beingDestroyed;
     // Start is called before the first frame update
     public override void Init()
     {
@@ -21,13 +22,16 @@ public class Destroyable : Actor
 
     public virtual void DestroyBlock()
     {
-        Vector3 v = transform.position;
-        v.z = typeId; // store type id in queue
-        if(player_Manager.placer.gameObject.activeSelf) {
-            player_Manager.placer.locationQueue.Enqueue(v);
-            player_Manager.placer.AddBlocks(1, typeId);
+        if(!beingDestroyed) {
+            beingDestroyed = true;
+            Vector3 v = transform.position;
+            v.z = typeId; // store type id in queue
+            if(player_Manager.placer.gameObject.activeSelf) {
+                player_Manager.placer.locationQueue.Enqueue(v);
+                player_Manager.placer.AddBlocks(1, typeId);
+            }
+            Destroy(gameObject);
         }
-        Destroy(gameObject);
     }
 
     void OnTriggerEnter2D(Collider2D col)

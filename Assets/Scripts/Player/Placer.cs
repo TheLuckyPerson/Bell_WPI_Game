@@ -32,6 +32,7 @@ public class Placer : Player
     void UpdateSelectedID(int id)
     {
         selectedId = id;
+        selectedId%=blockTypes.Count;
         while(blockTypes[selectedId].notExists) {
             selectedId+=1;
             selectedId%=blockTypes.Count;
@@ -39,21 +40,23 @@ public class Placer : Player
         blockSelector.transform.position = blockTypes[selectedId].blockNumText.transform.position;
     }
 
-    public override void Action(Vector3 dir)
+    public override bool Action(Vector3 dir)
     {
+        bool b = true;
         if(gameObject.activeSelf) {
             base.Action(dir);
-            if(blockTypes[selectedId].blockNum > 0) {
-                if(!CollisionDetect(dir, nonPlacableLayer)) {
-                    Vector3 loc = transform.position + dir * Utils.MOVE_SCALE;
-                    GameObject g = Instantiate(blockTypes[selectedId].placableObject, loc, Quaternion.identity);
-                    g.GetComponent<Destroyable>().dir = dir;
-                    if(player_Manager.shooter.gameObject.activeSelf)
-                        player_Manager.shooter.locationQueue.Enqueue(g.transform);
-                    blockTypes[selectedId].AddBlocks(-1);
-                }
+            if(blockTypes[selectedId].blockNum > 0 && !CollisionDetect(dir, nonPlacableLayer)) {
+                Vector3 loc = transform.position + dir * Utils.MOVE_SCALE;
+                GameObject g = Instantiate(blockTypes[selectedId].placableObject, loc, Quaternion.identity);
+                g.GetComponent<Destroyable>().dir = dir;
+                if(player_Manager.shooter.gameObject.activeSelf)
+                    player_Manager.shooter.UpdateQueue(g.transform);
+                blockTypes[selectedId].AddBlocks(-1);
+            } else {
+                b = false;
             }
         }
+        return b;
     }
 
     public override void AiControl()
@@ -62,8 +65,8 @@ public class Placer : Player
             Vector3 vAction = CheckNear(locationQueue.Peek());
             if(vAction != Vector3.zero) { // near a target
                 UpdateSelectedID((int)locationQueue.Peek().z);
-                Action(vAction);
-                locationQueue.Dequeue();
+                if(Action(vAction))
+                    locationQueue.Dequeue();
             } else {
                 MoveTowards(locationQueue.Peek());
             }

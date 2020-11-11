@@ -8,6 +8,7 @@ public class Actor : MonoBehaviour
     public LayerMask wallLayer;
     public LayerMask movableLayer;
     public Player_Manager player_Manager;
+    protected int priority;
 
     // Start is called before the first frame update
     void Start()
@@ -34,6 +35,7 @@ public class Actor : MonoBehaviour
     */
     public virtual bool MoveInDir(Vector3 dir) {
         player_Manager.targetList.Add(transform, transform.position+dir*Utils.MOVE_SCALE);
+        priority = player_Manager.targetList.Count;
         if(!CollisionDetect(dir, wallLayer)) {
             transform.position += Utils.MOVE_SCALE * dir;
             return true;
@@ -58,8 +60,11 @@ public class Actor : MonoBehaviour
         if (c) { // a collider detects a valid prediction
             return c.transform;
         }
+        int i = 1;
         foreach(KeyValuePair<Transform,Vector3> t in player_Manager.targetList) {
+            if(i >= priority) break;
             if(t.Value == transform.position+dir*Utils.MOVE_SCALE && t.Key != transform && layer == (layer | (1<<transform.gameObject.layer))) return t.Key;
+            i++;
         }
         return null;
     }
