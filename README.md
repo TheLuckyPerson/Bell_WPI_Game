@@ -1,2 +1,2 @@
 # Bell_WPI_Game
-google.com
+https://www.google.com/
